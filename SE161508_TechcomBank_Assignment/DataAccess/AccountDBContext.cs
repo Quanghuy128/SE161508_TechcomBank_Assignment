@@ -66,25 +66,29 @@ namespace SE161508_TechcomBank_Assignment.DataAccess
                             select account;
             Account searchAccount = accList.First();
             return searchAccount;
-        } 
-        public void FilterAccountsHaveMostRemainMoney ()
+        }
+        public void FilterAccountsHaveMostRemainMoney()
         {
             List<Customer> customers = CustomerDBContext.Instance.GetCustomerList;
+            List<Department> departments = DepartmentDBContext.Instance.GetDepartmentList;
             var q = (
                      from customer in customers
                      join account in AccountList on customer.CustomerID equals account.CustomerRefID
+                     join dep in departments on customer.DepartmentRefID equals dep.DepartmentID
                      group account by new
                      {
-                         customer.CustomerID,
-                         customer.CustomerName,
+                         dep.DepartmentID,
+                         dep.DepartmentName
                      }
-                    into gr
+                     into gr
                      select new
                      {
-                         CustomerName = gr.Key.CustomerName,
+                         DepartmenID = gr.Key.DepartmentID,
+                         DepartmentName = gr.Key.DepartmentName,
                          AccountName = (from t2 in gr orderby t2.AccountBalance descending select t2.AccountName).First(),
                          AccountBalance = (from t2 in gr select t2.AccountBalance).Max(),
                      });
+            
             q.ToList().ForEach(acc =>
             {
                 Console.WriteLine(acc.ToString());
